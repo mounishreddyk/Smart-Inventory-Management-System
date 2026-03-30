@@ -15,8 +15,9 @@ public class WebConfig {
 
                 registry.addMapping("/**")
                         .allowedOrigins("https://my-project-jfs.vercel.app")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*");
+                        .allowedMethods("*")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }
