@@ -1,89 +1,84 @@
 import axios from 'axios';
 
-const API_URL = '/api/products';
+// ✅ YOUR BACKEND URL
+const BASE_URL = "https://my-project-jfs-production.up.railway.app";
 
-// Create a basic Axios instance
+// Create Axios instance
 const api = axios.create({
+    baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
+// --- Product API ---
 export const getProducts = async () => {
-    const response = await api.get(API_URL);
+    const response = await api.get('/api/products');
     return response.data;
 };
 
 export const getProductById = async (id) => {
-    const response = await api.get(`${API_URL}/${id}`);
+    const response = await api.get(`/api/products/${id}`);
     return response.data;
 };
 
 export const addProduct = async (productData) => {
-    const response = await api.post(API_URL, productData);
+    const response = await api.post('/api/products', productData);
     return response.data;
 };
 
 export const updateProduct = async (id, productData) => {
-    const response = await api.put(`${API_URL}/${id}`, productData);
+    const response = await api.put(`/api/products/${id}`, productData);
     return response.data;
 };
 
 export const deleteProduct = async (id) => {
-    const response = await api.delete(`${API_URL}/${id}`);
+    const response = await api.delete(`/api/products/${id}`);
     return response.data;
 };
 
 export const searchProducts = async (name) => {
-    const response = await api.get(`${API_URL}/search`, { params: { name } });
+    const response = await api.get('/api/products/search', { params: { name } });
     return response.data;
 };
 
 // --- Category API ---
-const CATEGORY_API_URL = '/api/categories';
-
 export const getCategories = async () => {
-    const response = await api.get(CATEGORY_API_URL);
+    const response = await api.get('/api/categories');
     return response.data;
 };
 
 export const createCategory = async (name) => {
-    const response = await api.post(CATEGORY_API_URL, { name });
+    const response = await api.post('/api/categories', { name });
     return response.data;
 };
 
 export const deleteCategory = async (id) => {
-    const response = await api.delete(`${CATEGORY_API_URL}/${id}`);
+    const response = await api.delete(`/api/categories/${id}`);
     return response.data;
 };
 
 // --- Dashboard API ---
-const DASHBOARD_API_URL = '/api/dashboard';
-
 export const getDashboardAnalytics = async () => {
-    const response = await api.get(DASHBOARD_API_URL);
+    const response = await api.get('/api/dashboard');
     return response.data;
 };
 
 // --- AI API ---
-const AI_API_URL = '/api/ai';
-
 export const queryAI = async (query) => {
-    const response = await api.post(`${AI_API_URL}/query`, query, {
+    const response = await api.post('/api/ai/query', query, {
         headers: { 'Content-Type': 'text/plain' }
     });
     return response.data;
 };
 
 // --- Auth API ---
-const AUTH_API_URL = '/api/auth';
-
 export const loginUser = async (username, password) => {
-    const response = await api.post(`${AUTH_API_URL}/login`, { username, password });
+    const response = await api.post('/api/auth/login', { username, password });
     return response.data;
 };
 
 export const registerUser = async (username, password) => {
-    const response = await api.post(`${AUTH_API_URL}/register`, { username, password });
+    const response = await api.post('/api/auth/register', { username, password });
     return response.data;
 };
