@@ -25,6 +25,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -178,22 +179,33 @@ function App() {
             onChange={handleSearch}
           />
 
-          <button onClick={() => openForm()}>
-            <Plus /> Add
+          <button className="btn btn-secondary" onClick={() => setIsCategoryModalOpen(true)}>
+            <Tag size={18} /> Categories
           </button>
 
-          <button onClick={() => {
+          <button className="btn btn-primary" onClick={() => openForm()}>
+            <Plus size={18} /> Add Product
+          </button>
+
+          <button className="btn btn-ghost" onClick={() => {
             setIsAuthenticated(false);
             setCurrentUser(null);
             setAuthToken(null);
             localStorage.removeItem('token');
           }}>
-            <LogOut /> Logout
+            <LogOut size={18} /> Logout
           </button>
         </div>
       </header>
 
       <EnhancedDashboard />
+
+      {isCategoryModalOpen && (
+        <CategoryManagement onClose={() => {
+          setIsCategoryModalOpen(false);
+          fetchProductsAndCategories(); // refresh data so dropdown gets new categories
+        }} />
+      )}
 
       <main className="products-wrapper">
         {loading ? (
@@ -248,43 +260,73 @@ function App() {
         )}
       </main>
 
-      {/* SIMPLE FORM MODAL (IMPORTANT) */}
       {isModalOpen && (
-        <div className="modal">
-          <form onSubmit={handleSubmit}>
-            <input
-              placeholder="Name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
+        <div className="modal-overlay">
+          <div className="modal glass-panel">
+            <button className="btn-close" onClick={closeForm}><X size={20} /></button>
+            <h2 style={{ marginBottom: '1.5rem' }}>{editingItem ? 'Edit Product' : 'Add Product'}</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Name</label>
+                <input
+                  className="form-control"
+                  placeholder="Product Name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                />
+              </div>
 
-            <select
-              value={formData.categoryId}
-              onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-            >
-              <option value="">Select Category</option>
-              {categories.map(c => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
+              <div className="form-group">
+                <label>Category</label>
+                <select
+                  className="form-control"
+                  value={formData.categoryId}
+                  onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+                  required
+                >
+                  <option value="">Select Category</option>
+                  {categories.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
 
-            <input
-              type="number"
-              placeholder="Quantity"
-              value={formData.quantity}
-              onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
-            />
+              <div className="form-group">
+                <label>Quantity</label>
+                <input
+                  className="form-control"
+                  type="number"
+                  placeholder="Quantity"
+                  value={formData.quantity}
+                  onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
+                  min="0"
+                  required
+                />
+              </div>
 
-            <input
-              type="number"
-              placeholder="Price"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-            />
+              <div className="form-group">
+                <label>Price</label>
+                <input
+                  className="form-control"
+                  type="number"
+                  placeholder="Price"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
 
-            <button type="submit">Submit</button>
-            <button type="button" onClick={closeForm}>Cancel</button>
-          </form>
+              <div className="form-actions">
+                <button type="button" className="btn btn-ghost" onClick={closeForm}>Cancel</button>
+                <button type="submit" className="btn btn-primary">
+                  {editingItem ? 'Update' : 'Add'} Product
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
