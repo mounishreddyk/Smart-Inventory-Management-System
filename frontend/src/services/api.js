@@ -7,7 +7,7 @@ const api = axios.create({
     },
 });
 
-// PRODUCTS
+// ================= PRODUCTS =================
 export const getProducts = async () => {
     const res = await api.get('/products');
     return res.data;
@@ -33,8 +33,7 @@ export const searchProducts = async (name) => {
     return res.data;
 };
 
-
-    // CATEGORIES
+// ================= CATEGORIES =================
 export const getCategories = async () => {
     const res = await api.get('/categories');
     return res.data;
@@ -49,9 +48,8 @@ export const deleteCategory = async (id) => {
     const res = await api.delete(`/categories/${id}`);
     return res.data;
 };
-};
 
-// AUTH
+// ================= AUTH =================
 export const loginUser = async (username, password) => {
     const res = await api.post('/auth/login', { username, password });
     return res.data;
@@ -62,13 +60,13 @@ export const registerUser = async (username, password) => {
     return res.data;
 };
 
-// DASHBOARD
+// ================= DASHBOARD =================
 export const getDashboardAnalytics = async () => {
     const res = await api.get('/dashboard');
     return res.data;
 };
 
-// AI
+// ================= AI =================
 export const queryAI = async (query) => {
     const res = await api.post('/ai/query', query, {
         headers: { 'Content-Type': 'text/plain' }
