@@ -5,7 +5,7 @@ const BASE_URL = "https://my-project-jfs-production.up.railway.app";
 
 // Create Axios instance
 const api = axios.create({
-    baseURL: BASE_URL,
+    baseURL: "https://my-project-jfs-production.up.railway.app/api",
     headers: {
         'Content-Type': 'application/json',
     },

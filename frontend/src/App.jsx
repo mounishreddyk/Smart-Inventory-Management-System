@@ -20,35 +20,22 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Auth State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
 
-  // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [isAIChatOpen, setIsAIChatOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+
   const [formData, setFormData] = useState({
     name: '',
     categoryId: '',
     quantity: 0,
-    price: 0.0
+    price: 0
   });
 
-  // -------- FIXED ERROR MESSAGE --------
-  const isSafari = () => {
-    if (typeof navigator === 'undefined') return false;
-    return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  };
-
   const createNetworkErrorMessage = () => {
-    const safariNote = isSafari()
-      ? ' (Check browser network permissions.)'
-      : '';
-    return `Failed to load data. Please check server connection.${safariNote}`;
+    return `Failed to load data. Check server connection.`;
   };
-  // ------------------------------------
 
   const fetchProductsAndCategories = async () => {
     try {
@@ -60,11 +47,7 @@ function App() {
       setProducts(prodData);
       setCategories(catData);
     } catch (error) {
-      const message = error?.message?.includes('Network Error')
-        ? createNetworkErrorMessage()
-        : 'Failed to load data.';
-      toast.error(message);
-      console.error(error);
+      toast.error('Failed to load data.');
     } finally {
       setLoading(false);
     }
@@ -84,12 +67,8 @@ function App() {
       return;
     }
 
-    try {
-      const results = await searchProducts(value);
-      setProducts(results);
-    } catch (error) {
-      console.error(error);
-    }
+    const results = await searchProducts(value);
+    setProducts(results);
   };
 
   const openForm = (product = null) => {
@@ -113,42 +92,39 @@ function App() {
     setEditingItem(null);
   };
 
+  // ✅ FIXED HANDLE SUBMIT
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
+      const payload = {
+        ...formData,
+        categoryId: Number(formData.categoryId),
+        quantity: Number(formData.quantity),
+        price: Number(formData.price)
+      };
+
       if (editingItem) {
-        await updateProduct(editingItem.id, formData);
+        await updateProduct(editingItem.id, payload);
         toast.success('Product updated!');
       } else {
-        await addProduct(formData);
+        await addProduct(payload);
         toast.success('Product added!');
       }
+
       closeForm();
-      const updatedProducts = await getProducts();
-      setProducts(updatedProducts);
+      fetchProductsAndCategories();
+
     } catch (error) {
-      if (error.response?.data) {
-        Object.values(error.response.data).forEach(msg => toast.error(msg));
-      } else if (error.message?.includes('Network Error')) {
-        toast.error(createNetworkErrorMessage());
-      } else {
-        toast.error('Operation failed.');
-      }
       console.error(error);
+      toast.error('Operation failed.');
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm('Delete this product?')) {
-      try {
-        await deleteProduct(id);
-        toast.success('Deleted.');
-        const updatedProducts = await getProducts();
-        setProducts(updatedProducts);
-      } catch (error) {
-        toast.error('Delete failed.');
-        console.error(error);
-      }
+      await deleteProduct(id);
+      fetchProductsAndCategories();
     }
   };
 
@@ -217,6 +193,46 @@ function App() {
           ))
         )}
       </main>
+
+      {/* SIMPLE FORM MODAL (IMPORTANT) */}
+      {isModalOpen && (
+        <div className="modal">
+          <form onSubmit={handleSubmit}>
+            <input
+              placeholder="Name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            />
+
+            <select
+              value={formData.categoryId}
+              onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+            >
+              <option value="">Select Category</option>
+              {categories.map(c => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+
+            <input
+              type="number"
+              placeholder="Quantity"
+              value={formData.quantity}
+              onChange={(e) => setFormData({ ...formData, quantity: Number(e.target.value) })}
+            />
+
+            <input
+              type="number"
+              placeholder="Price"
+              value={formData.price}
+              onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+            />
+
+            <button type="submit">Submit</button>
+            <button type="button" onClick={closeForm}>Cancel</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
