@@ -56,8 +56,13 @@ function App() {
   };
 
   useEffect(() => {
-    fetchProductsAndCategories();
-  }, []);
+    if (isAuthenticated) {
+      fetchProductsAndCategories();
+    } else {
+      setProducts([]);
+      setCategories([]);
+    }
+  }, [isAuthenticated]);
 
   const handleSearch = async (e) => {
     const value = e.target.value;
@@ -192,6 +197,8 @@ function App() {
             setCurrentUser(null);
             setAuthToken(null);
             localStorage.removeItem('token');
+            setProducts([]);
+            setCategories([]);
           }}>
             <LogOut size={18} /> Logout
           </button>
